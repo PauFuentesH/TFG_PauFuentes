@@ -1,5 +1,8 @@
 import math
 
+"""
+Funcions pel fitxer dades_posturograf.py
+"""
 def quadrant_vector(vector):
     """
     Retorna el quadrant al que pertany un vector.
@@ -68,3 +71,113 @@ def canvi_quadrant(angle, quad_from, quad_to):
         nou_angle_deg += 360
 
     return nou_angle_deg
+
+"""
+Funcions pel fitxer carregar_dades.py
+"""
+def convertData(data, column, leftShift):
+    """
+    Converteix dades hexagessimals a decimals i aplica un backshift     
+    Args:
+    data: DataFrame amb les dades a convertir.
+    column: Índex de la columna que es vol convertir.
+    leftShift: Shift a aplicar a les dades.
+    
+    Returns:
+    El DataFrame amb les dades de la columna actualitzades.    
+    """
+    for i in range(len(data)):
+        temp = data.loc[i, column]
+        unsigned = int(temp,16)
+
+        if unsigned & (1 << 15) !=0:
+            unsigned = -1*((1<<15)-(unsigned &((1<<15)-1)))
+        
+        data.loc[i,column] = unsigned / (1<< leftShift)
+    return data
+
+def convertDataHex(data, column):
+    """
+    Converteix dades hexagessimals a decimals.   
+    Args:
+    data: DataFrame amb les dades a convertir.
+    column: Índex de la columna que es vol convertir.
+    
+    Returns:
+    El DataFrame amb les dades de la columna actualitzades.    
+    """
+    for i in range(len(data)):
+        temp = data.loc[i, column]
+        if not temp.isnumeric():
+            unsigned = int(temp,16)
+        else:
+            unsigned = int(temp)
+ 
+        data.loc[i,column] = unsigned
+    return data
+
+def all_non_consecutive(arr):
+    ans = []
+    start = arr[0]
+    index = 0
+    for number in arr:
+        if start == number:
+            start += 1
+            index += 1
+            continue
+
+        ans.append({'i': index, 'n': number})
+        start = number + 1
+        index += 1
+
+    return ans
+
+def grafica(llista, balance_test):
+    temp = all_non_consecutive(llista)
+    llista_resultat=[]
+    aux_llista=[]
+    aux_llista.append(llista[0])
+    for i in temp:
+        aux_llista.append(llista[i["i"]-1])
+        aux_llista.append(i["n"])
+    aux_llista.append(llista[-1])
+
+    i=0
+    while i < len(aux_llista):
+        new_df = balance_test.loc[aux_llista[i]:aux_llista[i+1]]
+        new_df.reset_index(inplace=True, drop=True)
+        llista_resultat.append(new_df)
+        i=i+2
+    return llista_resultat
+
+def find_discontinuity(lst):
+    """
+    Troba índex del primer valor on hi hagi una discontinuitat a la llista.
+    Args:
+    lst: Llista a on trobar la discontinuitat.
+
+    Returns:
+    Índex de la discontinuitat i llista fins la posició.
+    """
+    for i in range(1, len(lst)):
+        if lst[i] != lst[i - 1] + 1:
+            return i, lst[i - 1] + 1
+
+    return len(lst), lst[len(lst)-1]
+
+def obtenir_x_valors(llista, valor):
+    """
+    Obté tots els primers valors d'una llista de llistes amb dos valors.
+    
+    Args:
+    lista_de_listas: La llista de llistes amb dos valors.
+
+    Returns:
+    Una llista amb tots els primers valors.
+    """
+
+    valors = []
+    for l in llista:
+        valors.append(l[valor])
+
+    return valors
