@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 """
 Funcions pel fitxer dades_posturograf.py
@@ -73,7 +74,7 @@ def canvi_quadrant(angle, quad_from, quad_to):
     return nou_angle_deg
 
 """
-Funcions pel fitxer carregar_dades.py
+Funcions pel fitxer carregar_dades_IMU.py
 """
 def convertData(data, column, leftShift):
     """
@@ -181,3 +182,33 @@ def obtenir_x_valors(llista, valor):
         valors.append(l[valor])
 
     return valors
+"""
+Funcions pel fitxer carregar_dades_Postu.py
+"""
+def find_last_string_with_text(text, llista):
+    for string in llista[::-1]:
+        if text in string:
+            return string
+    return None
+
+def dist_lim_normalitat(punt, conjunt_de_punts):
+    """
+    Calcula la distància al límit de la normalitat d'un punt de dos dimensions respecte d'un conjunt de punts de dos dimensions.
+
+    Args:
+    punt: El punt que del qual es vol calcular la distància.
+    conjunto_de_puntos: El conjunto de puntos respecto del que se quiere calcular la distancia.
+
+    Returns:
+    La distancia al límite de la normalidad del punto respecto del conjunto de puntos.
+    """
+
+    media = np.mean(conjunt_de_punts, axis=0)
+    desviacion_estandar = np.std(conjunt_de_punts, axis=0)
+    distanciax = punt[0] - media[0]
+    distanciay = punt[1] - media[1]
+    #print(distanciax)
+    #print(distanciay)
+    #print(desviacion_estandar[0])
+    #print(desviacion_estandar[1])
+    return np.sqrt((distanciax / desviacion_estandar[0])**2 + (distanciay / desviacion_estandar[1])**2)
