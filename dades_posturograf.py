@@ -6,13 +6,18 @@ import os
 from sklearn.metrics import r2_score
 from funcions import quadrant_angle, quadrant_vector, canvi_quadrant
 
-directory = '/home/pau/Desktop/Quart Curs/TFG/Dades/Fitxers_posturograf_IMU/Fitxers per entrenar'
+directory = '../Fitxers per entrenar'
+r2 = []
+for i in range(10):
+    r2.append([])
+
 for filename in os.listdir(directory):
     if filename[-1] == 't':
+        
         reader = pd.read_csv(directory + "/" + filename, delimiter="\t", encoding="cp1252", skiprows=1, chunksize=1, header=None)
 
         df_dades = reader.get_chunk()
-
+        
         #'Nº_test', 'Val_test',Rep_test', 'EstML_test', 'EstAP_test'
         roa = df_dades.iloc[:,16:21].values.tolist()
         roc = df_dades.iloc[:,21:26].values.tolist()
@@ -49,7 +54,6 @@ for filename in os.listdir(directory):
         df_dades_postu_FxFy  = pd.read_csv(directory + "/" + filename, delimiter="\t", encoding="cp1252",skiprows=(17+int(num_test)+1+1200), index_col=False)
 
         #Càlcul paràmetres posturògraf
-
         params = {'Desplaç_total' : [], 'Angle_total' : [], 'Dispersio_ML' : [], 'Dispersio_AP' : [], 'Area_barrida' : []
          , 'V_mitjana' : [], 'Desplaç_ML' : [], 'Desplaç_AP' : [], 'Fmax_ML' : [], 'Fmax_AP' : []} 
         
@@ -64,7 +68,6 @@ for filename in os.listdir(directory):
             params['Desplaç_total'].append(np.sqrt((sum(punts_X[item])/len(punts_X[item]))**2 + (sum(punts_Y[item])/len(punts_Y[item]))**2))
 
         ##Angle total(º)
-        #print(filename)
         for item in llista_test:
             vector_nuvp = [(sum(punts_X[item])/len(punts_X[item])),(sum(punts_Y[item])/len(punts_Y[item]))]
             #print(vector_nuvp)
@@ -75,12 +78,7 @@ for filename in os.listdir(directory):
             #print("quadrant_from: ", quadrant_from)
             
             params['Angle_total'].append(canvi_quadrant(angle, quadrant_from, quadrant_to))
-        """
-        print('Estimades')
-        print(params['Angle_total'])
-        print('Reals')
-        print(df_resultats['Angulo Desplaz.(º)'])
-        """
+
         ##Dispersio ML i AP
         for item in llista_test:
             centre_X = sum(punts_X[item])/(len(punts_X[item])-1)
@@ -122,21 +120,22 @@ for filename in os.listdir(directory):
 
         #Comparació amb dades reals
         ##Calcular l'R²
-        r2 = []
+        r2[0].append(r2_score(df_resultats['Desplaz.Total(mm)'], params['Desplaç_total']))
+        r2[1].append(r2_score(df_resultats['Angulo Desplaz.(º)'], params['Angle_total']))
+        r2[2].append(r2_score(df_resultats['Dispers ML (mm)'], params['Dispersio_ML']))
+        r2[3].append(r2_score(df_resultats['Dispers AP (mm)'], params['Dispersio_AP']))
+        r2[4].append(r2_score(df_resultats['Area barrida (mm2)'], params['Area_barrida']))
+        r2[5].append(r2_score(df_resultats['Velocidad media (m/s)'], params['V_mitjana']))
+        r2[6].append(r2_score(df_resultats['Desplazam.ML (mm)'], params['Desplaç_ML']))
+        r2[7].append(r2_score(df_resultats['Desplazam.AP(mm)'], params['Desplaç_AP']))
+        r2[8].append(r2_score(df_resultats['Fuerza Max ML (N)'], params['Fmax_ML']))
+        r2[9].append(r2_score(df_resultats['Fuerza Max AP (N)'], params['Fmax_AP']))
 
-        r2.append(r2_score(df_resultats['Desplaz.Total(mm)'], params['Desplaç_total']))
-        r2.append(r2_score(df_resultats['Angulo Desplaz.(º)'], params['Angle_total']))
-        r2.append(r2_score(df_resultats['Dispers ML (mm)'], params['Dispersio_ML']))
-        r2.append(r2_score(df_resultats['Dispers AP (mm)'], params['Dispersio_AP']))
-        r2.append(r2_score(df_resultats['Area barrida (mm2)'], params['Area_barrida']))
-        r2.append(r2_score(df_resultats['Velocidad media (m/s)'], params['V_mitjana']))
-        r2.append(r2_score(df_resultats['Desplazam.ML (mm)'], params['Desplaç_ML']))
-        r2.append(r2_score(df_resultats['Desplazam.AP(mm)'], params['Desplaç_AP']))
-        r2.append(r2_score(df_resultats['Fuerza Max ML (N)'], params['Fmax_ML']))
-        r2.append(r2_score(df_resultats['Fuerza Max AP (N)'], params['Fmax_AP']))
+for i in range(10):
+    print("R^2 mitjana: ", np.mean(r2[i]))
+    #print("R^2 mitjana: ", np.mean(r2))
 
-        #print("R^2 de cada paràmetre: ", r2)
-        #print("R^2 mitjana: ", np.mean(r2))
+###En alguns pacients la velocitat mitjana no està enregistrada
 
 
 

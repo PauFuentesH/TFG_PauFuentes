@@ -1,8 +1,3 @@
-"""
-Fitxer on es carreguen en un fitxer .csv els valors de l'acceleració màxima, 
-el màxim del vector gravetat i el màxim desplaçament de cada pacient del
-arxiu Mataro_postu_IMU. 
-"""
 import os
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import normalize
