@@ -13,5 +13,7 @@ Jupyter notebook on es carrega el fitxer generat a 'carregar_dades.py' i es fan 
 #### funcions.py: 
 Fitxer que conté les funcions que utilitzen els fitxers 'dades_posturograf.py' i 'carregar_dades.py' i els fitxers 'IMU.ipynb' i 'posturograf.ipynb'.
 
+## Canvis als fitxers de les dades:
+S'han eliminat els fitxers amb tag CV52F del fitxer "Mataro_postu_IMU" per errors en el format de les dades del .csv.
 
 
